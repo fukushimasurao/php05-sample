@@ -3,7 +3,7 @@
 function db_connect()
 {
     try {
-        $db_name = 'gs_db3'; //データベース名
+        $db_name = 'gs_db5'; //データベース名
         $db_id   = 'root'; //アカウント名
         $db_pw   = ''; //パスワード：MAMPは'root'
         $db_host = 'localhost'; //DBホスト
@@ -39,8 +39,25 @@ function get_all_posts($pdo)
             $view .= '</a>';
             $view .= '</p>';
         }
-
         return $view;
+    }
+}
+
+
+function get_post_by_id($id, $pdo)
+{
+    //３．データ登録SQL作成
+    $stmt = $pdo->prepare('SELECT * FROM gs_an_table WHERE id = :id;');
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT); //PARAM_INTなので注意
+    $status = $stmt->execute(); //実行
+
+    $result = '';
+    if ($status === false) {
+        $error = $stmt->errorInfo();
+        exit('SQLError:' . print_r($error, true));
+    } else {
+        $result = $stmt->fetch();
+        return $result; // return忘れない！
     }
 
 }
