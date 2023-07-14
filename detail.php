@@ -1,10 +1,16 @@
 <?php
-require_once('funcs.php');
-
 $id = $_GET['id'];
-$pdo= db_conn();
 
-//３．データ登録SQL作成
+try {
+    $db_name = 'gs_db5'; //データベース名
+    $db_id   = 'root'; //アカウント名
+    $db_pw   = ''; //パスワード：MAMPは'root'
+    $db_host = 'localhost'; //DBホスト
+    $pdo = new PDO('mysql:dbname=' . $db_name . ';charset=utf8;host=' . $db_host, $db_id, $db_pw);
+} catch (PDOException $e) {
+    exit('DB Connection Error:' . $e->getMessage());
+}
+
 $stmt = $pdo->prepare('SELECT * FROM gs_an_table WHERE id = :id;');
 $stmt->bindValue(':id', $id, PDO::PARAM_INT); //PARAM_INTなので注意
 $status = $stmt->execute(); //実行
@@ -17,14 +23,7 @@ if ($status === false) {
     $result = $stmt->fetch();
 }
 ?>
-<!--
-２．HTML
-以下にindex.phpのHTMLをまるっと貼り付ける！
-(入力項目は「登録/更新」はほぼ同じになるから)
-※form要素 input type="hidden" name="id" を１項目追加（非表示項目）
-※form要素 action="update.php"に変更
-※input要素 value="ここに変数埋め込み"
--->
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -49,12 +48,11 @@ if ($status === false) {
         </nav>
     </header>
 
-    <!-- method, action, 各inputのnameを確認してください。  -->
     <form method="POST" action="update.php">
         <div class="jumbotron">
             <fieldset>
                 <legend>フリーアンケート</legend>
-                <label>名前：<input type="text" name="name" value="<?= h($result['name']) ?>"></label><br>
+                <label>名前：<input type="text" name="name" value="<?= $result['name'] ?>"></label><br>
                 <label>Email：<input type="text" name="email" value="<?= $result['email'] ?>"></label><br>
                 <label>年齢：<input type="text" name="age" value="<?= $result['age'] ?>"></label><br>
                 <label><textarea name="content" rows="4" cols="40"> <?= $result['content'] ?> </textarea></label><br>
